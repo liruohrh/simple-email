@@ -1,0 +1,35 @@
+# 简单邮件发送
+- 正常邮件需求: 有多个不同主题的模板, 有html/text, 其中变量有动态静态的
+  - 邮件类型
+    - send: 仅text, 仅html
+    - sendWithAttachments: 带上附件
+    - sendWithInlines: html需要携带一些资源, 如背景(实际上这个基本没用, 因为这些资源以URL提供更好一些)
+    - sendBothTextHtmlXXX: 则是同时发送text和html版本、
+  - simple-email使用MailService简化发送邮件接口, 使用TemplateEngine加载模板, 缓存模板, 渲染模板
+    - 加载模板: 不可能有很多模板, 可能最多也就10-20个左右, 因此只能设置唯一模板源
+    - 缓存模板: 
+      - 因为不同模板可能有共同的变量, 因此可以配置全局变量(共享)和局部变量(单个模板)
+      - 不管是全局还是局部, 都是静态变量, 因此在加载缓存时直接先拼接上, 在渲染模板时只需要传入动态变量
+        - 静态变量的目的是方便改, 如果基本不会改也需要设置
+- 待商议:
+  - 模板缓存是否需要caffeine这么高级的缓存, 是否简单的HashMap+定时任务(或者弱引用)即可
+# 使用
+- 配置: com.liruo.email.SimpleEmailProperties
+- 服务: 
+  - com.liruo.email.service.MailService, starter条件: 有spring.mail.username
+  - 或者直接使用com.liruo.email.utli.EmailUtil, 自己构建服务
+# 工作
+- 模板（text/html）
+    - 使用正则表达式匹配输入，获取contentParts和variables
+    - 可以为模板提供默认变量
+      - 配置文件：key=模板文件名（不需要扩展名）, global是全局共享的
+      - 变量类型：全局(所有模板)/局部变量(某个模板)
+      - 使用: 在解析时设置到contentParts中, 以便在render时只需要传入与设置动态的变量
+- TemplateEngine
+  - 管理模板, 比如保存变量, 解析模板并缓存 ,渲染
+  - 使用caffine缓存contentParts和variables
+    - key=模板文件名（需要扩展名）
+    - value=com.liruo.email.template.TemplateData
+    - caffine配置: 
+      - 默认配置过期=5h
+      - 使用LoadingCache自动加载

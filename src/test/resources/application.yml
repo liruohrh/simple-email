@@ -1,0 +1,12 @@
+simple-email:
+  variables:
+    global:
+      - applicationName=Simple-Email
+      - applicationDescription=simple encapsulation of the outgoing message
+      - logo64x64Url=https://github.githubassets.com/images/email/global/octocat-logo.png
+      - companyContactInformation=Inc. xxx省, xxx市 ・ xxx街道, 94107
+    verificationCodeDefault1:
+      - launchAppImageUrl=https://github.githubassets.com/images/email/signup/mona-launch-rocket.png
+      - inputEmailCodePageUrl=https://github.com/account_verifications?via_launch_code_email=true
+    verificationCodeDefault2:
+      launchAppImageUrl=https://github.githubassets.com/images/email/signup/mona-launch-rocket.png
